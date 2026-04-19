@@ -1,10 +1,7 @@
 import React, { useMemo, useState } from 'react';
-// Eliminamos Heart y Music que no se usaban
 import { BookOpen, Printer, Quote, QrCode } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// ✅ MOVEMOS rawData FUERA del componente (a nivel de módulo)
-// Esto asegura que se cree UNA SOLA VEZ y nunca cambie su referencia
 const rawData = [
   { frase: "Eres mi lugar favorito en el mundo y mi paz en los días grises.", poema: "Amo como ama el amor. No conozco otra razón para amar que amarte.", cancion: "Perfect - Ed Sheeran", url: "https://www.youtube.com/watch?v=2Vv-BfVoq4g" },
   { frase: "Mi vida es mucho más bonita desde que tú caminas a mi lado.", poema: "Te quiero no por lo que eres, sino por lo que soy cuando estoy contigo.", cancion: "Bésame Mucho - Andrea Bocelli", url: "https://www.youtube.com/watch?v=gS0Y_IatS9c" },
@@ -42,7 +39,6 @@ const rawData = [
 const App = () => {
   const [onlyQR, setOnlyQR] = useState(false);
 
-  // ✅ Ya no necesitamos dependencias porque rawData es estable (está fuera del componente)
   const romanticCards = useMemo(() => {
     const colors = [
       { bg: 'bg-rose-50', border: 'border-rose-300', text: 'text-rose-900', accent: 'text-rose-600' },
@@ -56,7 +52,8 @@ const App = () => {
       contentType: (index === 30) ? 2 : index % 3,
       style: colors[index % colors.length]
     }));
-  }, []); // ✅ Array vacío porque rawData es estable
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
 
   const generateQR = (url) => `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&color=8B1E3F&bgcolor=ffffff&margin=1&qzone=2`;
 
@@ -128,17 +125,14 @@ const App = () => {
       </div>
 
       <style>{`
-        /* ESTILOS DE PANTALLA */
         .hover-scale { transition: transform 0.3s ease; }
         .hover-scale:hover { transform: translateY(-5px); }
 
-        /* ESTILOS DE IMPRESIÓN */
         @media print {
           .d-print-none { display: none !important; }
           body { background: white !important; }
           @page { size: A4; margin: 1cm; }
           
-          /* Mantenemos la cuadrícula original de 2 columnas en impresión */
           .row { 
             display: grid !important; 
             grid-template-columns: 1fr 1fr !important; 
@@ -146,7 +140,6 @@ const App = () => {
             width: 100% !important;
           }
 
-          /* Forzamos que cada tarjeta ocupe su espacio original */
           .col { 
             height: 350px !important; 
             width: 100% !important;
@@ -154,12 +147,8 @@ const App = () => {
             page-break-inside: avoid !important;
           }
 
-          /* Salto de página cada 4 tarjetas para mantener el orden */
           .col:nth-child(4n) { page-break-after: always; }
 
-          /* SI ESTÁ ACTIVO EL MODO SOLO QR:
-             Ocultamos las tarjetas que NO son QR pero MANTENEMOS su espacio 
-             o las removemos del flujo sin estirar las demás. */
           .mode-qr-active .hide-in-qr-mode {
              display: none !important;
           }
